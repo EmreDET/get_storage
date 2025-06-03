@@ -10,7 +10,8 @@ class StorageImpl {
   final String? path;
   final String fileName;
 
-  ValueStorage<Map<String, dynamic>> subject = ValueStorage<Map<String, dynamic>>(<String, dynamic>{});
+  ValueStorage<Map<String, dynamic>> subject =
+      ValueStorage<Map<String, dynamic>>(<String, dynamic>{});
 
   void clear() {
     localStorage.removeItem(fileName);
