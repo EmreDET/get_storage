@@ -19,28 +19,28 @@ class StorageImpl {
 
   RandomAccessFile? _randomAccessfile;
 
-  void clear() async {
+  Future<void> clear() async {
     subject
       ..value?.clear()
-      ..changeValue("", null);
+      ..changeValue('', null);
   }
 
   Future<void> deleteBox() async {
-    final box = await _fileDb(isBackup: false);
-    final backup = await _fileDb(isBackup: true);
+    var box = await _fileDb(isBackup: false);
+    var backup = await _fileDb(isBackup: true);
     await Future.wait([box.delete(), backup.delete()]);
   }
 
   Future<void> flush() async {
-    final buffer = utf8.encode(json.encode(subject.value));
-    final length = buffer.length;
-    RandomAccessFile _file = await _getRandomFile();
+    var buffer = utf8.encode(json.encode(subject.value));
+    var length = buffer.length;
+    RandomAccessFile file = await _getRandomFile();
 
-    _randomAccessfile = await _file.lock();
+    _randomAccessfile = await file.lock();
     _randomAccessfile = await _randomAccessfile!.setPosition(0);
     _randomAccessfile = await _randomAccessfile!.writeFrom(buffer);
     _randomAccessfile = await _randomAccessfile!.truncate(length);
-    _randomAccessfile = await _file.unlock();
+    _randomAccessfile = await file.unlock();
     _madeBackup();
   }
 
@@ -68,8 +68,8 @@ class StorageImpl {
   Future<void> init([Map<String, dynamic>? initialData]) async {
     subject.value = initialData ?? <String, dynamic>{};
 
-    RandomAccessFile _file = await _getRandomFile();
-    return _file.lengthSync() == 0 ? flush() : _readFile();
+    RandomAccessFile file = await _getRandomFile();
+    return file.lengthSync() == 0 ? flush() : _readFile();
   }
 
   void remove(String key) {
@@ -78,7 +78,7 @@ class StorageImpl {
       ..changeValue(key, null);
   }
 
-  void write(String key, dynamic value) {
+  void write(String key, value) {
     subject
       ..value?[key] = value
       ..changeValue(key, value);
@@ -86,16 +86,16 @@ class StorageImpl {
 
   Future<void> _readFile() async {
     try {
-      RandomAccessFile _file = await _getRandomFile();
-      _file = await _file.setPosition(0);
-      final buffer = new Uint8List(await _file.length());
-      await _file.readInto(buffer);
+      RandomAccessFile file = await _getRandomFile();
+      file = await file.setPosition(0);
+      var buffer = Uint8List(await file.length());
+      await file.readInto(buffer);
       subject.value = json.decode(utf8.decode(buffer));
     } catch (e) {
       Get.log('Corrupted box, recovering backup file', isError: true);
-      final _file = await _getFile(true);
+      var file = await _getFile(true);
 
-      final content = await _file.readAsString()
+      var content = await file.readAsString()
         ..trim();
 
       if (content.isEmpty) {
@@ -113,15 +113,17 @@ class StorageImpl {
   }
 
   Future<RandomAccessFile> _getRandomFile() async {
-    if (_randomAccessfile != null) return _randomAccessfile!;
-    final fileDb = await _getFile(false);
+    if (_randomAccessfile != null) {
+      return _randomAccessfile!;
+    }
+    var fileDb = await _getFile(false);
     _randomAccessfile = await fileDb.open(mode: FileMode.append);
 
     return _randomAccessfile!;
   }
 
   Future<File> _getFile(bool isBackup) async {
-    final fileDb = await _fileDb(isBackup: isBackup);
+    var fileDb = await _fileDb(isBackup: isBackup);
     if (!fileDb.existsSync()) {
       fileDb.createSync(recursive: true);
     }
@@ -129,25 +131,25 @@ class StorageImpl {
   }
 
   Future<File> _fileDb({required bool isBackup}) async {
-    final dir = await _getImplicitDir();
-    final _path = await _getPath(isBackup, path ?? dir.path);
-    final _file = File(_path);
-    return _file;
+    var dir = await _getImplicitDir();
+    var path = await _getPath(isBackup, this.path ?? dir.path);
+    var file = File(path);
+    return file;
   }
 
   Future<Directory> _getImplicitDir() async {
     try {
       return getApplicationDocumentsDirectory();
     } catch (err) {
-      throw err;
+      rethrow;
     }
   }
 
   Future<String> _getPath(bool isBackup, String? path) async {
-    final _isWindows = GetPlatform.isWindows;
-    final _separator = _isWindows ? '\\' : '/';
+    var isWindows = GetPlatform.isWindows;
+    var separator = isWindows ? '\\' : '/';
     return isBackup
-        ? '$path$_separator$fileName.bak'
-        : '$path$_separator$fileName.gs';
+        ? '$path$separator$fileName.bak'
+        : '$path$separator$fileName.gs';
   }
 }

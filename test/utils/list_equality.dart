@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 const int _HASH_MASK = 0x7fffffff;
 
 class ListEquality<E> implements Equality<List<E>> {
@@ -7,12 +9,18 @@ class ListEquality<E> implements Equality<List<E>> {
 
   @override
   bool equals(List<E> list1, List<E> list2) {
-    if (identical(list1, list2)) return true;
+    if (identical(list1, list2)) {
+      return true;
+    }
 
     var length = list1.length;
-    if (length != list2.length) return false;
+    if (length != list2.length) {
+      return false;
+    }
     for (var i = 0; i < length; i++) {
-      if (!_elementEquality.equals(list1[i], list2[i])) return false;
+      if (!_elementEquality.equals(list1[i], list2[i])) {
+        return false;
+      }
     }
     return true;
   }
@@ -27,10 +35,10 @@ class ListEquality<E> implements Equality<List<E>> {
       var c = _elementEquality.hash(list[i]);
       hash = (hash + c) & _HASH_MASK;
       hash = (hash + (hash << 10)) & _HASH_MASK;
-      hash ^= (hash >> 6);
+      hash ^= hash >> 6;
     }
     hash = (hash + (hash << 3)) & _HASH_MASK;
-    hash ^= (hash >> 11);
+    hash ^= hash >> 11;
     hash = (hash + (hash << 15)) & _HASH_MASK;
     return hash;
   }

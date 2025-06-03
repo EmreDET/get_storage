@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_storage/src/storage_impl.dart';
 import 'package:get_storage/src/read_write_value.dart';
+import 'package:get_storage/src/storage_impl.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'utils/list_equality.dart';
@@ -38,11 +38,11 @@ void main() async {
   });
 
   test('write, read listen, e removeListen', () async {
-    String valueListen = "";
+    String valueListen = '';
     g.write('test', 'a');
     g.write('test2', 'a');
 
-    final removeListen = g.listenKey('test', (val) {
+    var removeListen = g.listenKey('test', (val) {
       valueListen = val;
     });
 
@@ -64,7 +64,7 @@ void main() async {
   });
 
   test('Write and read', () {
-    var list = new List<int>.generate(50, (i) {
+    var list = List<int>.generate(50, (i) {
       int count = i + 1;
       g.write('write', count);
       return count;
@@ -77,7 +77,7 @@ void main() async {
     await g.write('write', 'abc');
     expect('abc', g.read('write'));
 
-    final file = await _fileDb();
+    var file = await _fileDb();
     file.writeAsStringSync('ndj323e');
     await GetStorage.init();
 
@@ -85,8 +85,8 @@ void main() async {
   });
 
   test('Write and read using delegate', () {
-    final data = 0.val('write');
-    var list = new List<int>.generate(50, (i) {
+    var data = 0.val('write');
+    var list = List<int>.generate(50, (i) {
       int count = i + 1;
       data.val = count;
       return count;
@@ -98,7 +98,7 @@ void main() async {
   test('Write, read, remove and exists', () {
     expect(null, g.read('write'));
 
-    var list = new List<int>.generate(50, (i) {
+    var list = List<int>.generate(50, (i) {
       int count = i + 1;
       g.write('write', count);
       return count;
@@ -109,9 +109,9 @@ void main() async {
   });
 
   test('newContainer', () async {
-    final container1 = await GetStorage.init('container1');
+    var container1 = await GetStorage.init('container1');
     await GetStorage.init('newContainer');
-    final newContainer = GetStorage('newContainer');
+    var newContainer = GetStorage('newContainer');
 
     /// Attempting to start a Container that has already started must return the container already created.
     var container2 = await GetStorage.init();
@@ -123,8 +123,7 @@ void main() async {
   });
 
   group('get keys/values', () {
-    Function(Iterable, List) eq =
-        (i, l) => const ListEquality().equals(i.toList(), l);
+    bool eq(i, l) => const ListEquality().equals(i.toList(), l);
 
     test('should return their stored dynamic values', () {
       expect(eq(g.getKeys().toList(), []), true);
@@ -147,9 +146,9 @@ void main() async {
 
 Future<File> _fileDb(
     {bool isBackup = false, String fileName = 'GetStorage'}) async {
-  final dir = await getApplicationDocumentsDirectory();
-  final _path = dir.path;
-  final _file =
-      isBackup ? File('$_path/$fileName.bak') : File('$_path/$fileName.gs');
-  return _file;
+  var dir = await getApplicationDocumentsDirectory();
+  var path = dir.path;
+  var file =
+      isBackup ? File('$path/$fileName.bak') : File('$path/$fileName.gs');
+  return file;
 }

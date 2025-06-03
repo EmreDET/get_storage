@@ -15,7 +15,7 @@ class GetStorage {
     if (_sync.containsKey(container)) {
       return _sync[container]!;
     } else {
-      final instance = GetStorage._internal(container, path, initialData);
+      var instance = GetStorage._internal(container, path, initialData);
       _sync[container] = instance;
       return instance;
     }
@@ -46,7 +46,7 @@ class GetStorage {
     try {
       await _concrete.init(_initialData);
     } catch (err) {
-      throw err;
+      rethrow;
     }
   }
 
@@ -65,7 +65,7 @@ class GetStorage {
 
   /// return data true if value is different of null;
   bool hasData(String key) {
-    return (read(key) == null ? false : true);
+    return read(key) != null;
   }
 
   Map<String, dynamic> get changes => _concrete.subject.changes;
@@ -75,14 +75,14 @@ class GetStorage {
     return _concrete.subject.addListener(value);
   }
 
-  Map<Function, Function> _keyListeners = <Function, Function>{};
+  final Map<Function, Function> _keyListeners = <Function, Function>{};
 
   VoidCallback listenKey(String key, ValueSetter callback) {
-    final VoidCallback listen = () {
+    void listen() {
       if (changes.keys.first == key) {
         callback(changes[key]);
       }
-    };
+    }
 
     _keyListeners[callback] = listen;
     return _concrete.subject.addListener(listen);
@@ -99,7 +99,7 @@ class GetStorage {
   // }
 
   /// Write data on your container
-  Future<void> write(String key, dynamic value) async {
+  Future<void> write(String key, value) async {
     writeInMemory(key, value);
     // final _encoded = json.encode(value);
     // await _concrete.write(key, json.decode(_encoded));
@@ -107,13 +107,15 @@ class GetStorage {
     return _tryFlush();
   }
 
-  void writeInMemory(String key, dynamic value) {
+  void writeInMemory(String key, value) {
     _concrete.write(key, value);
   }
 
   /// Write data on your only if data is null
-  Future<void> writeIfNull(String key, dynamic value) async {
-    if (read(key) != null) return;
+  Future<void> writeIfNull(String key, value) async {
+    if (read(key) != null) {
+      return;
+    }
     return write(key, value);
   }
 

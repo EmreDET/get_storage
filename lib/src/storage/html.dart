@@ -10,7 +10,7 @@ class StorageImpl {
   final String? path;
   final String fileName;
 
-  ValueStorage<Map<String, dynamic>> subject = ValueStorage<Map<String, dynamic>>(Map<String, dynamic>());
+  ValueStorage<Map<String, dynamic>> subject = ValueStorage<Map<String, dynamic>>(<String, dynamic>{});
 
   void clear() {
     localStorage.removeItem(fileName);
@@ -18,7 +18,7 @@ class StorageImpl {
 
     subject
       ..value?.clear()
-      ..changeValue("", null);
+      ..changeValue('', null);
   }
 
   Future<bool> _exists() async {
@@ -26,7 +26,7 @@ class StorageImpl {
   }
 
   Future<void> flush() {
-    return _writeToStorage(subject.value ?? Map<String, dynamic>());
+    return _writeToStorage(subject.value ?? <String, dynamic>{});
   }
 
   T? read<T>(String key) {
@@ -42,11 +42,11 @@ class StorageImpl {
   }
 
   Future<void> init([Map<String, dynamic>? initialData]) async {
-    subject.value = initialData ?? Map<String, dynamic>();
+    subject.value = initialData ?? <String, dynamic>{};
     if (await _exists()) {
       await _readFromStorage();
     } else {
-      await _writeToStorage(subject.value ?? Map<String, dynamic>());
+      await _writeToStorage(subject.value ?? <String, dynamic>{});
     }
     return;
   }
@@ -58,7 +58,7 @@ class StorageImpl {
     //  return _writeToStorage(subject.value);
   }
 
-  void write(String key, dynamic value) {
+  void write(String key, value) {
     subject
       ..value?[key] = value
       ..changeValue(key, value);
@@ -74,8 +74,8 @@ class StorageImpl {
   }
 
   Future<void> _readFromStorage() async {
-    final dataFromLocal = localStorage.getItem(fileName);
-    var map = Map<String, dynamic>();
+    var dataFromLocal = localStorage.getItem(fileName);
+    var map = <String, dynamic>{};
     if (dataFromLocal != null) {
       map = json.decode(dataFromLocal) as Map<String, dynamic>;
     }
