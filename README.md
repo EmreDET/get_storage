@@ -5,6 +5,12 @@ It is written entirely in Dart and easily integrates with Get framework of Flutt
 Supports Android, iOS, Web, Mac, Linux, and fuchsia and Windows**. 
 Can store String, int, double, Map and List
 
+
+### Updates by me [yurtemre7](https://github.com/yurtemre7):
+- Upgrade the package to at least Flutter 3.29
+- Removed html usage and used the appropiate and new [web](https://pub.dev/packages/web) package.
+- Fixed example project
+
 ### Add to your pubspec:
 ```
 dependencies:
